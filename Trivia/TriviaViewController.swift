@@ -27,6 +27,24 @@ class TriviaViewController: UIViewController {
     addGradient()
     questionContainerView.layer.cornerRadius = 8.0
     // TODO: FETCH TRIVIA QUESTIONS HERE
+    //https://opentdb.com/api.php?amount=10&category=25&difficulty=medium
+    TriviaQuestionService.fetchRandomQuestion { [weak self] questions in
+      DispatchQueue.main.async {
+        self?.questions = questions
+        self?.updateQuestion(withQuestionIndex: 0)
+      }
+    }
+      
+      // Set text colors explicitly
+      questionLabel.textColor = .black
+      categoryLabel.textColor = .darkGray
+      currentQuestionNumberLabel.textColor = .black
+      
+      // Set button text colors
+      answerButton0.setTitleColor(.black, for: .normal)
+      answerButton1.setTitleColor(.black, for: .normal)
+      answerButton2.setTitleColor(.black, for: .normal)
+      answerButton3.setTitleColor(.black, for: .normal)
   }
   
   private func updateQuestion(withQuestionIndex questionIndex: Int) {
@@ -45,10 +63,15 @@ class TriviaViewController: UIViewController {
     if answers.count > 2 {
       answerButton2.setTitle(answers[2], for: .normal)
       answerButton2.isHidden = false
+    } else {
+    answerButton2.isHidden = true
     }
+
     if answers.count > 3 {
       answerButton3.setTitle(answers[3], for: .normal)
       answerButton3.isHidden = false
+    } else {
+      answerButton3.isHidden = true
     }
   }
   
@@ -75,7 +98,13 @@ class TriviaViewController: UIViewController {
     let resetAction = UIAlertAction(title: "Restart", style: .default) { [unowned self] _ in
       currQuestionIndex = 0
       numCorrectQuestions = 0
-      updateQuestion(withQuestionIndex: currQuestionIndex)
+      //updateQuestion(withQuestionIndex: currQuestionIndex) fetch rand questions
+      TriviaQuestionService.fetchRandomQuestion { [weak self] questions in
+        DispatchQueue.main.async {
+          self?.questions = questions
+          self?.updateQuestion(withQuestionIndex: 0)
+        }
+      }
     }
     alertController.addAction(resetAction)
     present(alertController, animated: true, completion: nil)
